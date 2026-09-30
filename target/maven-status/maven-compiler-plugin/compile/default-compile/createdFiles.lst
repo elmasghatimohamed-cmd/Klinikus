@@ -9,6 +9,7 @@ ma\youcode\klinikus\dao\implementation\jdbc\JdbcConsultationDAO.class
 ma\youcode\klinikus\dao\implementation\jdbc\JdbcPatientDAO.class
 ma\youcode\klinikus\model\Consultation.class
 ma\youcode\klinikus\service\PatientService.class
+ma\youcode\klinikus\web\LoginServlet$1.class
 ma\youcode\klinikus\filter\CSRFFilter.class
 ma\youcode\klinikus\model\User.class
 ma\youcode\klinikus\model\Patient.class
