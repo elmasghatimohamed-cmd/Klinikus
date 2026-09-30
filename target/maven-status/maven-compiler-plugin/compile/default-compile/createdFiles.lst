@@ -1,6 +1,7 @@
 ma\youcode\klinikus\web\LoginServlet.class
 ma\youcode\klinikus\service\ConsultationService.class
 ma\youcode\klinikus\dao\ConsultationDAO.class
+ma\youcode\klinikus\DatabaseConnectionTest.class
 ma\youcode\klinikus\filter\AuthenticationFilter.class
 ma\youcode\klinikus\model\enums\ConsultationStatus.class
 ma\youcode\klinikus\dao\implementation\jdbc\JdbcUserDAO.class

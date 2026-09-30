@@ -35,6 +35,14 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Jakarta JSP 3.1 -->
+        <dependency>
+            <groupId>jakarta.servlet.jsp</groupId>
+            <artifactId>jakarta.servlet.jsp-api</artifactId>
+            <version>${jakarta.servlet.jsp.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- BCrypt -->
         <dependency>
             <groupId>org.mindrot</groupId>
@@ -48,6 +56,20 @@
             <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
+        </dependency>
+
+        <!-- PostgreSQL JDBC Driver -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.8</version>
+        </dependency>
+
+        <!-- HikariCP -->
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>7.0.2</version>
         </dependency>
 
     </dependencies>
