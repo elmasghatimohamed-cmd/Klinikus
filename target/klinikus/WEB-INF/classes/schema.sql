@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 -- Klinikus schema (PostgreSQL)
 CREATE TABLE IF NOT EXISTS utilisateur (
   id BIGSERIAL PRIMARY KEY,
@@ -37,3 +38,6 @@ INSERT INTO utilisateur (nom, email, mot_de_passe, role) VALUES
  ('Infirmier Test', 'infirmier@klinikus.ma', '$2a$10$j/u4vNZHXcwI/A/R8qebwegbR8eJlRsS6YgRWeCm8ddVFcjPP0uZ.', 'INFIRMIER'),
  ('Dr Test', 'medecin@klinikus.ma', '$2a$10$d0zALAeYmnXh1wE9csTTFOaZZJHbknuhszzg5tIxFY9RCUZZaTc6S', 'GENERALISTE');
  
+=======
+CREATE DATABASE klinikus;
+>>>>>>> 7284af4c79a5565d5308b7a8066f0029f4023f79
