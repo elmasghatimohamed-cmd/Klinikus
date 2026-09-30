@@ -18,7 +18,7 @@ public class DatabaseConnection {
 
             HikariConfig config = new HikariConfig();
             config.setJdbcUrl("jdbc:postgresql://localhost:5432/klinikus_db");
-            config.setUsername("mohamed");
+            config.setUsername("badr");
             config.setPassword("admin123");
 
             config.setMaximumPoolSize(10);
