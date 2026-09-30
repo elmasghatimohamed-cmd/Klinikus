@@ -1,13 +1,20 @@
 package ma.youcode.klinikus.dao.implementation;
 
-import ma.youcode.klinikus.dao.PatientDAO;
-import ma.youcode.klinikus.model.Patient;
-
-import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import javax.sql.DataSource;
+
+import ma.youcode.klinikus.dao.PatientDAO;
+import ma.youcode.klinikus.model.Patient;
 
 public class JdbcPatientDAO implements PatientDAO {
 
@@ -53,14 +60,18 @@ public class JdbcPatientDAO implements PatientDAO {
         String sql = "SELECT * FROM patient WHERE id = ?";
 
         try (Connection con = dataSource.getConnection();
-            PreparedStatement prpr = con.prepareStatement(sql)){
-            ResultSet rs = prpr.executeQuery();
+                PreparedStatement prpr = con.prepareStatement(sql)) {
 
-            while (rs.next()) {
-                
+            prpr.setLong(1, id);
+
+            try (ResultSet rs = prpr.executeQuery()) {
+                return rs.next()
+                        ? Optional.of(mapRow(rs))
+                        : Optional.empty();
             }
-        } catch (Exception e) {
-            // TODO: handle exception
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error finding patient", e);
         }
     }
 

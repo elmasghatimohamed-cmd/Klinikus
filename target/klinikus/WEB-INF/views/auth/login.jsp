@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-login
-=======
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 
     <% String erreur=(String) request.getAttribute("erreur"); String email=(String) request.getAttribute("email"); if
@@ -125,4 +122,3 @@ login
         </body>
 
         </html>
->>>>>>> 7284af4c79a5565d5308b7a8066f0029f4023f79

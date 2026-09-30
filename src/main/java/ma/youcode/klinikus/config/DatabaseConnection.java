@@ -1,12 +1,14 @@
 package ma.youcode.klinikus.config;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import io.github.cdimascio.dotenv.Dotenv;
-
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+
+import javax.sql.DataSource;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import io.github.cdimascio.dotenv.Dotenv;
 
 public class DatabaseConnection {
 
@@ -20,16 +22,10 @@ public class DatabaseConnection {
             Dotenv dotenv = Dotenv.load();
 
             HikariConfig config = new HikariConfig();
-<<<<<<< HEAD
-            config.setJdbcUrl("jdbc:postgresql://localhost:5432/klinikus_db");
-            config.setUsername("badr");
-            config.setPassword("admin123");
-=======
 
             config.setJdbcUrl(dotenv.get("DB_URL"));
             config.setUsername(dotenv.get("DB_USERNAME"));
             config.setPassword(dotenv.get("DB_PASSWORD"));
->>>>>>> 7284af4c79a5565d5308b7a8066f0029f4023f79
 
             config.setMaximumPoolSize(10);
             config.setMinimumIdle(2);
