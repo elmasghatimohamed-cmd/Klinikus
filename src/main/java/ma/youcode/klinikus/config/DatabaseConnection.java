@@ -2,6 +2,7 @@ package ma.youcode.klinikus.config;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import io.github.cdimascio.dotenv.Dotenv;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -16,10 +17,13 @@ public class DatabaseConnection {
 
             Class.forName("org.postgresql.Driver");
 
+            Dotenv dotenv = Dotenv.load();
+
             HikariConfig config = new HikariConfig();
-            config.setJdbcUrl("jdbc:postgresql://localhost:5432/klinikus_db");
-            config.setUsername("mohamed");
-            config.setPassword("admin123");
+
+            config.setJdbcUrl(dotenv.get("DB_URL"));
+            config.setUsername(dotenv.get("DB_USERNAME"));
+            config.setPassword(dotenv.get("DB_PASSWORD"));
 
             config.setMaximumPoolSize(10);
             config.setMinimumIdle(2);
@@ -27,10 +31,16 @@ public class DatabaseConnection {
             config.setConnectionTimeout(30000);
 
             dataSource = new HikariDataSource(config);
+
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Driver JDBC introuvable dans le classpath.", e);
+
+            throw new RuntimeException(
+                    "Driver JDBC introuvable dans le classpath.", e);
+
         } catch (Exception e) {
-            throw new RuntimeException("Erreur lors de l'initialisation de la base de données.", e);
+
+            throw new RuntimeException(
+                    "Erreur lors de l'initialisation de la base de donnees.", e);
         }
     }
 
