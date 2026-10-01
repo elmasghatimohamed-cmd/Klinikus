@@ -40,6 +40,12 @@ public class AuthService {
 
         boolean valide;
         try {
+            System.out.println("Email: " + email);
+            System.out.println("User found: " + trouve.isPresent());
+
+            if (trouve.isPresent()) {
+                System.out.println("Password hash: " + trouve.get().getPassword());
+            }
             valide = BCrypt.checkpw(motDePasse, hash);
         } catch (IllegalArgumentException e) {
             // hash mal formé en base (ex. mot de passe stocké en clair par erreur)
