@@ -1,4 +1,4 @@
-package ma.youcode.klinikus.dao.implementation;
+package ma.youcode.klinikus.dao.implementation.jdbc; 
 
 import java.sql.Connection;
 import java.sql.Date;

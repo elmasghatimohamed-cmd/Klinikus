@@ -1,4 +1,3 @@
-C:\Users\pc\Desktop\Klinikus\src\main\java\ma\youcode\klinikus\BCryptTest.java
 C:\Users\pc\Desktop\Klinikus\src\main\java\ma\youcode\klinikus\config\DatabaseConnection.java
 C:\Users\pc\Desktop\Klinikus\src\main\java\ma\youcode\klinikus\dao\ConsultationDAO.java
 C:\Users\pc\Desktop\Klinikus\src\main\java\ma\youcode\klinikus\dao\implementation\jdbc\JdbcConsultationDAO.java
@@ -19,4 +18,4 @@ C:\Users\pc\Desktop\Klinikus\src\main\java\ma\youcode\klinikus\service\PatientSe
 C:\Users\pc\Desktop\Klinikus\src\main\java\ma\youcode\klinikus\web\ConsultationServlet.java
 C:\Users\pc\Desktop\Klinikus\src\main\java\ma\youcode\klinikus\web\LoginServlet.java
 C:\Users\pc\Desktop\Klinikus\src\main\java\ma\youcode\klinikus\web\LogoutServlet.java
-C:\Users\pc\Desktop\Klinikus\src\main\java\ma\youcode\klinikus\web\PatientsServlet.java
+C:\Users\pc\Desktop\Klinikus\src\main\java\ma\youcode\klinikus\web\PatientServlet.java
