@@ -25,16 +25,38 @@ public class ConsultationService {
     }
 
     /**
+     * Retourne le patient s'il existe et n'a pas encore été consulté.
+     *
+     * @throws IllegalArgumentException si l'ID est absent, le patient introuvable
+     *                                  ou déjà consulté
+     */
+    public Patient getPatientAConsulter(Long patientId) {
+        if (patientId == null) {
+            throw new IllegalArgumentException("Patient manquant.");
+        }
+
+        Patient patient = patientDAO.findById(patientId)
+                .orElseThrow(() -> new IllegalArgumentException("Patient introuvable avec l'ID: " + patientId));
+
+        if (consultationDAO.findByPatientId(patientId).isPresent()) {
+            throw new IllegalArgumentException("Ce patient a déjà été consulté.");
+        }
+        return patient;
+    }
+
+    /**
      * Clôture la consultation pour un patient donné
      */
     public Consultation cloturer(Long patientId, String motif, String observations, String diagnostic,
             String traitement, Long medecinId) {
         if (patientId == null || motif == null || motif.isBlank() || diagnostic == null || diagnostic.isBlank()) {
-            throw new IllegalArgumentException("Le patient, le motif et le diagnostic sont obligatoires.");
+            throw new IllegalArgumentException("Le motif et le diagnostic sont obligatoires.");
+        }
+        if (medecinId == null) {
+            throw new IllegalArgumentException("Médecin non identifié.");
         }
 
-        patientDAO.findById(patientId)
-                .orElseThrow(() -> new IllegalArgumentException("Patient introuvable avec l'ID: " + patientId));
+        getPatientAConsulter(patientId);
 
         Consultation consultation = new Consultation();
         consultation.setPatientId(patientId);
