@@ -6,6 +6,7 @@ import java.util.Optional;
 import ma.youcode.klinikus.model.Consultation;
 
 public interface ConsultationDAO {
+
     Consultation save(Consultation consultation);
 
     Optional findById(Long id);
@@ -13,4 +14,6 @@ public interface ConsultationDAO {
     Optional findByPatientId(Long patientId);
 
     List findAll();
+
+    List findPatientIdsWithConsultation();
 }
