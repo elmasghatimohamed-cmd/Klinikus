@@ -27,7 +27,7 @@ public class PatientServlet extends HttpServlet {
             throws ServletException, IOException {
 
         if ("nouveau".equals(req.getParameter("action"))) {
-            req.getRequestDispatcher("/WEB-INF/views/patient-form.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/views/infirmier/patient-form.jsp").forward(req, resp);
             return;
         }
 
@@ -39,12 +39,7 @@ public class PatientServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        HttpSession session = req.getSession();
-        String sessionToken = (String) session.getAttribute("csrfToken");
-        if (sessionToken == null || !sessionToken.equals(req.getParameter("csrfToken"))) {
-            resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid CSRF token");
-            return;
-        }
+        
 
         try {
             Patient p = new Patient();
@@ -62,7 +57,7 @@ public class PatientServlet extends HttpServlet {
 
         } catch (IllegalArgumentException | DateTimeParseException | NullPointerException e) {
             req.setAttribute("error", "Donnees invalides, verifiez le formulaire");
-            req.getRequestDispatcher("/WEB-INF/views/patient-form.jsp").forward(req, resp);
+            req.getRequestDispatcher("/WEB-INF/views/infirmier/patient-form.jsp").forward(req, resp);
         }
     }
 }
