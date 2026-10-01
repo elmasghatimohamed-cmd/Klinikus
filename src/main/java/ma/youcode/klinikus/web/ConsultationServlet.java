@@ -29,7 +29,7 @@ public class ConsultationServlet extends HttpServlet {
         PatientDAO patientDAO = new JdbcPatientDAO(DatabaseConnection.getDataSource());
         ConsultationDAO consultationDAO = new JdbcConsultationDAO(DatabaseConnection.getDataSource());
 
-        this.patientService = new PatientService(patientDAO);
+        this.patientService = new PatientService(patientDAO , consultationDAO);
         this.consultationService = new ConsultationService(consultationDAO, patientDAO);
     }
 

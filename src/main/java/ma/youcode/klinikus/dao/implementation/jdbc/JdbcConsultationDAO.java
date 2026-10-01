@@ -26,7 +26,7 @@ public class JdbcConsultationDAO implements ConsultationDAO {
 
     @Override
     public Consultation save(Consultation consultation) {
-        String sql = "INSERT INTO consultation (patient_id, medecin_id, motif, observations, diagnostic, traitement, cout, status, date_consultation) "
+        String sql = "INSERT INTO consultation (patient_id, medecin_id, motif, observations, diagnostic, traitement, cout, statut, date_consultation) "
                 +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -58,7 +58,7 @@ public class JdbcConsultationDAO implements ConsultationDAO {
     }
 
     @Override
-    public Optional findById(Long id) {
+    public Optional<Consultation> findById(Long id) {
         String sql = "SELECT * FROM consultation WHERE id = ?";
         try (Connection con = dataSource.getConnection();
                 PreparedStatement prpr = con.prepareStatement(sql)) {
@@ -75,7 +75,7 @@ public class JdbcConsultationDAO implements ConsultationDAO {
     }
 
     @Override
-    public Optional findByPatientId(Long patientId) {
+    public Optional<Consultation> findByPatientId(Long patientId) {
         String sql = "SELECT * FROM consultation WHERE patient_id = ?";
         try (Connection con = dataSource.getConnection();
                 PreparedStatement prpr = con.prepareStatement(sql)) {
@@ -92,8 +92,8 @@ public class JdbcConsultationDAO implements ConsultationDAO {
     }
 
     @Override
-    public List findAll() {
-        List list = new ArrayList<>();
+    public List<Consultation> findAll() {
+        List<Consultation> list = new ArrayList<>();
         String sql = "SELECT * FROM consultation";
 
         try (Connection con = dataSource.getConnection();
@@ -120,7 +120,7 @@ public class JdbcConsultationDAO implements ConsultationDAO {
         c.setDiagnostic(rs.getString("diagnostic"));
         c.setTraitement(rs.getString("traitement"));
         c.setCout(rs.getDouble("cout"));
-        c.setStatus(ConsultationStatus.valueOf(rs.getString("status")));
+        c.setStatus(ConsultationStatus.valueOf(rs.getString("statut")));
         c.setDateConsultation(rs.getTimestamp("date_consultation").toLocalDateTime());
         return c;
     }
