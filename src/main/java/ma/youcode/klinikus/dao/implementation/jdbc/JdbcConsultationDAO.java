@@ -25,53 +25,54 @@ public class JdbcConsultationDAO implements ConsultationDAO {
     }
 
     @Override
-    public Consultation save(Consultation consultation) {
+    public Consultation save(Consultation c) {
         String sql = "INSERT INTO consultation (patient_id, medecin_id, motif, observations, diagnostic, traitement, cout, statut, date_consultation) "
-                +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection con = dataSource.getConnection();
-                PreparedStatement prpr = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = dataSource.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
-            prpr.setLong(1, consultation.getPatientId());
-            prpr.setLong(2, consultation.getMedecinId());
-            prpr.setString(3, consultation.getMotif());
-            prpr.setString(4, consultation.getObservations());
-            prpr.setString(5, consultation.getDiagnostic());
-            prpr.setString(6, consultation.getTraitement());
-            prpr.setDouble(7, consultation.getCout());
-            prpr.setString(8, consultation.getStatus().name());
-            prpr.setTimestamp(9, Timestamp.valueOf(consultation.getDateConsultation()));
+            ps.setLong(1, c.getPatientId());
+            ps.setLong(2, c.getMedecinId());
+            ps.setString(3, c.getMotif());
+            ps.setString(4, c.getObservations());
+            ps.setString(5, c.getDiagnostic());
+            ps.setString(6, c.getTraitement());
+            ps.setDouble(7, c.getCout());
+            ps.setString(8, c.getStatus() != null ? c.getStatus().name() : ConsultationStatus.EN_ATTENT.name());
+            ps.setTimestamp(9, c.getDateConsultation() != null ? Timestamp.valueOf(c.getDateConsultation())
+                    : new Timestamp(System.currentTimeMillis()));
 
-            prpr.executeUpdate();
+            ps.executeUpdate();
 
-            try (ResultSet keys = prpr.getGeneratedKeys()) {
-                if (keys.next()) {
-                    consultation.setId(keys.getLong(1));
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    c.setId(rs.getLong(1));
                 }
             }
-            return consultation;
+            return c;
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error saving consultation", e);
+            throw new RuntimeException("Erreur lors de la sauvegarde de la consultation", e);
         }
     }
 
     @Override
     public Optional<Consultation> findById(Long id) {
         String sql = "SELECT * FROM consultation WHERE id = ?";
-        try (Connection con = dataSource.getConnection();
-                PreparedStatement prpr = con.prepareStatement(sql)) {
+        try (Connection conn = dataSource.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            prpr.setLong(1, id);
-
-            try (ResultSet rs = prpr.executeQuery()) {
-                return rs.next() ? Optional.of(mapRow(rs)) : Optional.empty();
+            ps.setLong(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return Optional.of(mapResultSetToConsultation(rs));
+                }
             }
-
         } catch (SQLException e) {
-            throw new RuntimeException("Error finding consultation by id", e);
+            throw new RuntimeException("Erreur lors de la recherche de la consultation par ID", e);
         }
+        return Optional.empty();
     }
 
     @Override
@@ -81,36 +82,52 @@ public class JdbcConsultationDAO implements ConsultationDAO {
                 PreparedStatement prpr = con.prepareStatement(sql)) {
 
             prpr.setLong(1, patientId);
-
             try (ResultSet rs = prpr.executeQuery()) {
-                return rs.next() ? Optional.of(mapRow(rs)) : Optional.empty();
+                if (rs.next()) {
+                    return Optional.of(mapResultSetToConsultation(rs));
+                }
             }
-
         } catch (SQLException e) {
-            throw new RuntimeException("Error finding consultation by patientId", e);
+            throw new RuntimeException("Erreur lors de la recherche de la consultation par ID patient", e);
         }
+        return Optional.empty();
     }
 
     @Override
     public List<Consultation> findAll() {
         List<Consultation> list = new ArrayList<>();
         String sql = "SELECT * FROM consultation";
-
-        try (Connection con = dataSource.getConnection();
-                PreparedStatement prpr = con.prepareStatement(sql);
-                ResultSet rs = prpr.executeQuery()) {
+        try (Connection conn = dataSource.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                list.add(mapRow(rs));
+                list.add(mapResultSetToConsultation(rs));
             }
-            return list;
-
         } catch (SQLException e) {
-            throw new RuntimeException("Error listing consultations", e);
+            throw new RuntimeException("Erreur lors de la récupération des consultations", e);
         }
+        return list;
     }
 
-    private Consultation mapRow(ResultSet rs) throws SQLException {
+    @Override
+    public List findPatientIdsWithConsultation() {
+        List patientIds = new ArrayList<>();
+        String sql = "SELECT DISTINCT patient_id FROM consultation";
+        try (Connection conn = dataSource.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery(sql)) {
+
+            while (rs.next()) {
+                patientIds.add(rs.getLong("patient_id"));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de la récupération des IDs des patients avec consultation", e);
+        }
+        return patientIds;
+    }
+
+    private Consultation mapResultSetToConsultation(ResultSet rs) throws SQLException {
         Consultation c = new Consultation();
         c.setId(rs.getLong("id"));
         c.setPatientId(rs.getLong("patient_id"));
@@ -121,7 +138,11 @@ public class JdbcConsultationDAO implements ConsultationDAO {
         c.setTraitement(rs.getString("traitement"));
         c.setCout(rs.getDouble("cout"));
         c.setStatus(ConsultationStatus.valueOf(rs.getString("statut")));
-        c.setDateConsultation(rs.getTimestamp("date_consultation").toLocalDateTime());
+
+        Timestamp ts = rs.getTimestamp("date_consultation");
+        if (ts != null) {
+            c.setDateConsultation(ts.toLocalDateTime());
+        }
         return c;
     }
 }
