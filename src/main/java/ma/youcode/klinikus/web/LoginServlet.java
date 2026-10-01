@@ -71,7 +71,7 @@ public class LoginServlet extends HttpServlet {
     private static String urlAccueil(Role role) {
         return switch (role) {
             case INFIRMIER -> "/infirmier/patients";
-            case GENERALISTE -> "/generaliste/patients";
+            case GENERALISTE -> "/generaliste/consultation";
         };
     }
 }

@@ -16,18 +16,20 @@ import ma.youcode.klinikus.dao.implementation.jdbc.JdbcConsultationDAO;
 import ma.youcode.klinikus.dao.implementation.jdbc.JdbcPatientDAO;
 import ma.youcode.klinikus.model.User;
 import ma.youcode.klinikus.service.ConsultationService;
+import ma.youcode.klinikus.service.PatientService;
 
 @WebServlet("/generaliste/consultation")
 public class ConsultationServlet extends HttpServlet {
 
     private ConsultationService consultationService;
-    private PatientDAO patientDAO;
+    private PatientService patientService;
 
     @Override
     public void init() throws ServletException {
-        this.patientDAO = new JdbcPatientDAO(DatabaseConnection.getDataSource());
+        PatientDAO patientDAO = new JdbcPatientDAO(DatabaseConnection.getDataSource());
         ConsultationDAO consultationDAO = new JdbcConsultationDAO(DatabaseConnection.getDataSource());
 
+        this.patientService = new PatientService(patientDAO);
         this.consultationService = new ConsultationService(consultationDAO, patientDAO);
     }
 
@@ -42,7 +44,7 @@ public class ConsultationServlet extends HttpServlet {
 
         try {
             Long patientId = Long.parseLong(patientIdParam);
-            Optional patientOpt = patientDAO.findById(patientId);
+            Optional patientOpt = patientService.trouverParId(patientId);
 
             if (patientOpt.isEmpty()) {
                 resp.sendRedirect(req.getContextPath() + "/generaliste/patients?error=not_found");
@@ -84,7 +86,7 @@ public class ConsultationServlet extends HttpServlet {
 
             if (patientIdStr != null && !patientIdStr.isEmpty()) {
                 try {
-                    patientDAO.findById(Long.parseLong(patientIdStr))
+                    patientService.trouverParId(Long.parseLong(patientIdStr))
                             .ifPresent(p -> req.setAttribute("patient", p));
                 } catch (NumberFormatException ignored) {
                 }
