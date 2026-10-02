@@ -1,17 +1,23 @@
 package ma.youcode.klinikus.web;
 
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+
+import javax.sql.DataSource;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import ma.youcode.klinikus.config.DatabaseConnection;
 import ma.youcode.klinikus.dao.implementation.jdbc.JdbcConsultationDAO;
 import ma.youcode.klinikus.dao.implementation.jdbc.JdbcPatientDAO;
 import ma.youcode.klinikus.model.Patient;
 import ma.youcode.klinikus.service.PatientService;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
+import javax.sql.DataSource;
+import ma.youcode.klinikus.dao.implementation.jdbc.JdbcConsultationDAO;
 
 @WebServlet("/infirmier/patients")
 public class PatientServlet extends HttpServlet {
@@ -20,9 +26,8 @@ public class PatientServlet extends HttpServlet {
 
     @Override
     public void init() {
-        patientService = new PatientService(
-                new JdbcPatientDAO(DatabaseConnection.getDataSource()),
-                new JdbcConsultationDAO(DatabaseConnection.getDataSource()));
+        DataSource ds = DatabaseConnection.getDataSource();
+        patientService = new PatientService(new JdbcPatientDAO(ds), new JdbcConsultationDAO(ds));
     }
 
     @Override
@@ -41,8 +46,6 @@ public class PatientServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
-        
 
         try {
             Patient p = new Patient();
