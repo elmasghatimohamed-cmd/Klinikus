@@ -13,7 +13,7 @@ public interface ConsultationDAO {
 
     Optional findByPatientId(Long patientId);
 
-    List findAll();
+    List<Consultation> findAll();
 
-    List findPatientIdsWithConsultation();
+    List<Long> findPatientIdsWithConsultation();
 }

@@ -20,4 +20,5 @@ ma\youcode\klinikus\model\User.class
 ma\youcode\klinikus\model\Patient.class
 ma\youcode\klinikus\web\LogoutServlet.class
 ma\youcode\klinikus\web\PatientServlet.class
+ma\youcode\klinikus\web\GeneralistePatientServlet.class
 ma\youcode\klinikus\dao\PatientDAO.class

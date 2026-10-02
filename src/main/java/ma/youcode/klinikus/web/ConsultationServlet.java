@@ -30,6 +30,7 @@ public class ConsultationServlet extends HttpServlet {
     public void init() throws ServletException {
         PatientDAO patientDAO = new JdbcPatientDAO(DatabaseConnection.getDataSource());
         ConsultationDAO consultationDAO = new JdbcConsultationDAO(DatabaseConnection.getDataSource());
+
         this.consultationService = new ConsultationService(consultationDAO, patientDAO);
     }
 

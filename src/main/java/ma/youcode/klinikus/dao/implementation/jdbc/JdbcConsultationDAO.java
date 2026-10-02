@@ -58,7 +58,7 @@ public class JdbcConsultationDAO implements ConsultationDAO {
     }
 
     @Override
-    public Optional findById(Long id) {
+    public Optional<Consultation> findById(Long id) {
         String sql = "SELECT * FROM consultation WHERE id = ?";
         try (Connection conn = dataSource.getConnection();
                 PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -76,13 +76,13 @@ public class JdbcConsultationDAO implements ConsultationDAO {
     }
 
     @Override
-    public Optional findByPatientId(Long patientId) {
-        String sql = "SELECT * FROM consultation WHERE patient_id = ? ORDER BY date_consultation DESC LIMIT 1";
-        try (Connection conn = dataSource.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql)) {
+    public Optional<Consultation> findByPatientId(Long patientId) {
+        String sql = "SELECT * FROM consultation WHERE patient_id = ?";
+        try (Connection con = dataSource.getConnection();
+                PreparedStatement prpr = con.prepareStatement(sql)) {
 
-            ps.setLong(1, patientId);
-            try (ResultSet rs = ps.executeQuery()) {
+            prpr.setLong(1, patientId);
+            try (ResultSet rs = prpr.executeQuery()) {
                 if (rs.next()) {
                     return Optional.of(mapResultSetToConsultation(rs));
                 }
@@ -94,8 +94,8 @@ public class JdbcConsultationDAO implements ConsultationDAO {
     }
 
     @Override
-    public List findAll() {
-        List list = new ArrayList<>();
+    public List<Consultation> findAll() {
+        List<Consultation> list = new ArrayList<>();
         String sql = "SELECT * FROM consultation";
         try (Connection conn = dataSource.getConnection();
                 Statement stmt = conn.createStatement();
@@ -111,8 +111,8 @@ public class JdbcConsultationDAO implements ConsultationDAO {
     }
 
     @Override
-    public List findPatientIdsWithConsultation() {
-        List patientIds = new ArrayList<>();
+    public List<Long> findPatientIdsWithConsultation() {
+        List<Long> patientIds = new ArrayList<>();
         String sql = "SELECT DISTINCT patient_id FROM consultation";
         try (Connection conn = dataSource.getConnection();
                 Statement stmt = conn.createStatement();

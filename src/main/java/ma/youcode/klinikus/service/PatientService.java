@@ -7,15 +7,18 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import ma.youcode.klinikus.dao.ConsultationDAO;
 import ma.youcode.klinikus.dao.PatientDAO;
 import ma.youcode.klinikus.model.Patient;
 
 public class PatientService {
 
     private PatientDAO patientDAO;
+    private ConsultationDAO consultationDAO;
 
-    public PatientService(PatientDAO patientDAO) {
+    public PatientService(PatientDAO patientDAO, ConsultationDAO consultationDAO) {
         this.patientDAO = patientDAO;
+        this.consultationDAO = consultationDAO;
     }
 
     public Patient enregistrerPatient(Patient p) {
@@ -30,15 +33,16 @@ public class PatientService {
         return patientDAO.save(p);
     }
 
-    public List getPatientsDuJour() {
+    public List<Patient> getPatientsDuJour() {
         LocalDate today = LocalDate.now();
+
         return patientDAO.findAll().stream()
-                .filter(p -> p.getDateArrivee().toLocalDate().equals(today))
+                .filter(p -> p.getDateArrivee() != null && p.getDateArrivee().toLocalDate().equals(today))
                 .sorted(Comparator.comparing(Patient::getDateArrivee))
                 .collect(Collectors.toList());
     }
 
-    public Optional trouverParId(Long id) {
+    public Optional<Patient> trouverParId(Long id) {
         return patientDAO.findById(id);
     }
 }

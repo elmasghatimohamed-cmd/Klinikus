@@ -1,6 +1,7 @@
 package ma.youcode.klinikus.web;
 
 import ma.youcode.klinikus.config.DatabaseConnection;
+import ma.youcode.klinikus.dao.implementation.jdbc.JdbcConsultationDAO;
 import ma.youcode.klinikus.dao.implementation.jdbc.JdbcPatientDAO;
 import ma.youcode.klinikus.model.Patient;
 import ma.youcode.klinikus.service.PatientService;
@@ -19,7 +20,9 @@ public class PatientServlet extends HttpServlet {
 
     @Override
     public void init() {
-        patientService = new PatientService(new JdbcPatientDAO(DatabaseConnection.getDataSource()));
+        patientService = new PatientService(
+                new JdbcPatientDAO(DatabaseConnection.getDataSource()),
+                new JdbcConsultationDAO(DatabaseConnection.getDataSource()));
     }
 
     @Override
