@@ -111,8 +111,8 @@ public class JdbcConsultationDAO implements ConsultationDAO {
     }
 
     @Override
-    public List<Long> findPatientIdsWithConsultation() {
-        List<Long> patientIds = new ArrayList<>();
+    public List findPatientIdsWithConsultation() {
+        List patientIds = new ArrayList<>();
         String sql = "SELECT DISTINCT patient_id FROM consultation";
         try (Connection conn = dataSource.getConnection();
                 Statement stmt = conn.createStatement();
@@ -144,5 +144,26 @@ public class JdbcConsultationDAO implements ConsultationDAO {
             c.setDateConsultation(ts.toLocalDateTime());
         }
         return c;
+    }
+
+    @Override
+    public List<Long> findPatientIdsByStatus(ConsultationStatus status) {
+        String sql = "SELECT patient_id FROM consultation WHERE statut = ?";
+        List<Long> ids = new ArrayList<>();
+
+        try (Connection con = dataSource.getConnection();
+                PreparedStatement prpr = con.prepareStatement(sql)) {
+
+            prpr.setString(1, status.name());
+            try (ResultSet res = prpr.executeQuery()) {
+                while (res.next()) {
+                    ids.add(res.getLong("patient_id"));
+                }
+            }
+            return ids;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error listing patients by status", e);
+        }
     }
 }
