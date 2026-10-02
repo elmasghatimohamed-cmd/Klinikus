@@ -111,8 +111,8 @@ public class JdbcConsultationDAO implements ConsultationDAO {
     }
 
     @Override
-    public List findPatientIdsWithConsultation() {
-        List patientIds = new ArrayList<>();
+    public List<Long> findPatientIdsWithConsultation() {
+        List<Long> patientIds = new ArrayList<>();
         String sql = "SELECT DISTINCT patient_id FROM consultation";
         try (Connection conn = dataSource.getConnection();
                 Statement stmt = conn.createStatement();

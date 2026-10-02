@@ -5,14 +5,11 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import ma.youcode.klinikus.dao.ConsultationDAO;
 import ma.youcode.klinikus.dao.PatientDAO;
-import ma.youcode.klinikus.model.Consultation;
 import ma.youcode.klinikus.model.Patient;
-import ma.youcode.klinikus.model.enums.ConsultationStatus;
 
 public class PatientService {
 
@@ -39,19 +36,9 @@ public class PatientService {
     public List<Patient> getPatientsDuJour() {
         LocalDate today = LocalDate.now();
 
-        Predicate<Consultation> enAttente =
-                c -> c.getStatus() == ConsultationStatus.EN_ATTENT;
-
-        return consultationDAO.findAll().stream()
-                .filter(enAttente)
-                .filter(c -> c.getDateConsultation() != null
-                        && c.getDateConsultation().toLocalDate().equals(today))
-                .sorted(Comparator.comparing(Consultation::getDateConsultation))
-                .map(Consultation::getPatientId)
-                .distinct()
-                .map(patientDAO::findById)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
+        return patientDAO.findAll().stream()
+                .filter(p -> p.getDateArrivee() != null && p.getDateArrivee().toLocalDate().equals(today))
+                .sorted(Comparator.comparing(Patient::getDateArrivee))
                 .collect(Collectors.toList());
     }
 
