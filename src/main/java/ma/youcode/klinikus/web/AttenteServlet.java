@@ -13,6 +13,7 @@ import ma.youcode.klinikus.dao.ConsultationDAO;
 import ma.youcode.klinikus.dao.PatientDAO;
 import ma.youcode.klinikus.dao.implementation.jdbc.JdbcConsultationDAO;
 import ma.youcode.klinikus.dao.implementation.jdbc.JdbcPatientDAO;
+import ma.youcode.klinikus.model.Patient;
 import ma.youcode.klinikus.service.ConsultationService;
 
 @WebServlet("/generaliste/attente")
@@ -29,7 +30,7 @@ public class AttenteServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        List patientsEnAttente = consultationService.getPatientsEnAttenteDuJour();
+        List<Patient> patientsEnAttente = consultationService.getPatientsEnAttenteDuJour();
 
         req.setAttribute("patientsEnAttente", patientsEnAttente);
         req.getRequestDispatcher("/WEB-INF/views/generaliste/attente.jsp").forward(req, resp);

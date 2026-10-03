@@ -1,10 +1,5 @@
 package ma.youcode.klinikus.service;
 
-import ma.youcode.klinikus.dao.ConsultationDAO;
-import ma.youcode.klinikus.dao.PatientDAO;
-import ma.youcode.klinikus.model.Patient;
-import ma.youcode.klinikus.model.enums.ConsultationStatus;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -12,10 +7,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import ma.youcode.klinikus.dao.ConsultationDAO;
+import ma.youcode.klinikus.dao.PatientDAO;
+import ma.youcode.klinikus.model.Patient;
+import ma.youcode.klinikus.model.enums.ConsultationStatus;
+
 public class PatientService {
 
-    private PatientDAO patientDAO;
-    private ConsultationDAO consultationDAO;
+    private final PatientDAO patientDAO;
+    private final ConsultationDAO consultationDAO;
 
     public PatientService(PatientDAO patientDAO, ConsultationDAO consultationDAO) {
         this.patientDAO = patientDAO;
@@ -27,7 +27,8 @@ public class PatientService {
                 || p.getPrenom() == null || p.getPrenom().isBlank()
                 || p.getNumSecu() == null || p.getNumSecu().isBlank()
                 || p.getDateNaissance() == null) {
-            throw new IllegalArgumentException("Nom, prenom, date de naissance et numero de securite sociale sont obligatoires");
+            throw new IllegalArgumentException(
+                    "Nom, prenom, date de naissance et numero de securite sociale sont obligatoires");
         }
         p.setDateArrivee(LocalDateTime.now());
         return patientDAO.save(p);
