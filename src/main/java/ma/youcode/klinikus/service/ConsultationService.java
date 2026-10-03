@@ -38,7 +38,11 @@ public class ConsultationService {
         Patient patient = patientDAO.findById(patientId)
                 .orElseThrow(() -> new IllegalArgumentException("Patient introuvable avec l'ID: " + patientId));
 
-        if (consultationDAO.findByPatientId(patientId).isPresent()) {
+        Consultation consultation = consultationDAO.findByPatientId(patientId)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Aucune consultation n'existe pour ce patient."));
+
+        if (consultation.getStatus() != ConsultationStatus.EN_ATTENT) {
             throw new IllegalArgumentException("Ce patient a déjà été consulté.");
         }
         return patient;
@@ -58,28 +62,28 @@ public class ConsultationService {
 
         getPatientAConsulter(patientId);
 
-        Consultation consultation = new Consultation();
-        consultation.setPatientId(patientId);
-        consultation.setMedecinId(medecinId);
-        consultation.setMotif(motif);
-        consultation.setObservations(observations);
-        consultation.setDiagnostic(diagnostic);
-        consultation.setTraitement(traitement);
-        consultation.setCout(Consultation.COUT_FIXE);
-        consultation.setStatus(ConsultationStatus.TERMINEE);
-        consultation.setDateConsultation(LocalDateTime.now());
+        Consultation c = consultationDAO.findByPatientId(patientId)
+                .orElseThrow(() -> new IllegalArgumentException("Aucune consultation n'existe pour ce patient."));
 
-        return consultationDAO.save(consultation);
+        c.setMedecinId(medecinId);
+        c.setMotif(motif);
+        c.setObservations(observations);
+        c.setDiagnostic(diagnostic);
+        c.setTraitement(traitement);
+        c.setStatus(ConsultationStatus.TERMINEE);
+        c.setDateConsultation(LocalDateTime.now());
+
+        return consultationDAO.update(c);
     }
 
     public List<Patient> getPatientsEnAttenteDuJour() {
-        Set<Long> patientIdsTraites = new HashSet<>(consultationDAO.findPatientIdsWithConsultation());
+        Set<Long> patientIdsEnAttente = new HashSet<>(
+                consultationDAO.findPatientIdsByStatus(ConsultationStatus.EN_ATTENT));
         LocalDate aujourdhui = LocalDate.now();
-
         return patientDAO.findAll().stream()
                 .filter(p -> p.getDateArrivee() != null
                         && p.getDateArrivee().toLocalDate().equals(aujourdhui))
-                .filter(p -> !patientIdsTraites.contains(p.getId()))
+                .filter(p -> patientIdsEnAttente.contains(p.getId()))
                 .sorted(Comparator.comparing(Patient::getDateArrivee))
                 .collect(Collectors.toList());
     }

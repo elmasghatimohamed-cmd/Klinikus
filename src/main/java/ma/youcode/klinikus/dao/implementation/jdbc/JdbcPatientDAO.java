@@ -1,4 +1,5 @@
 package ma.youcode.klinikus.dao.implementation.jdbc;
+
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -14,10 +15,11 @@ import javax.sql.DataSource;
 
 import ma.youcode.klinikus.dao.PatientDAO;
 import ma.youcode.klinikus.model.Patient;
+import ma.youcode.klinikus.model.enums.ConsultationStatus;
 
 public class JdbcPatientDAO implements PatientDAO {
 
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
     public JdbcPatientDAO(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -25,33 +27,55 @@ public class JdbcPatientDAO implements PatientDAO {
 
     @Override
     public Patient save(Patient p) {
-        String sql = "INSERT INTO patient (nom, prenom, date_naissance, num_secu, tension, "
+        String patientSql = "INSERT INTO patient (nom, prenom, date_naissance, num_secu, tension, "
                 + "frequence_cardiaque, temperature, frequence_respiratoire, date_arrivee) "
                 + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        try (Connection con = dataSource.getConnection();
-             PreparedStatement prpr = con.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        String consultationSql = "INSERT INTO consultation (patient_id, statut, date_consultation) "
+                + "VALUES (?, ?, ?)";
 
-            prpr.setString(1, p.getNom());
-            prpr.setString(2, p.getPrenom());
-            prpr.setDate(3, Date.valueOf(p.getDateNaissance()));
-            prpr.setString(4, p.getNumSecu());
-            prpr.setString(5, p.getTension());
-            prpr.setInt(6, p.getFrequenceCardiaque());
-            prpr.setDouble(7, p.getTemperature());
-            prpr.setInt(8, p.getFrequenceRespiratoire());
-            prpr.setTimestamp(9, Timestamp.valueOf(p.getDateArrivee()));
+        try (Connection con = dataSource.getConnection()) {
+            con.setAutoCommit(false);
+            try {
+                try (PreparedStatement ps = con.prepareStatement(patientSql, Statement.RETURN_GENERATED_KEYS)) {
+                    ps.setString(1, p.getNom());
+                    ps.setString(2, p.getPrenom());
+                    ps.setDate(3, Date.valueOf(p.getDateNaissance()));
+                    ps.setString(4, p.getNumSecu());
+                    ps.setString(5, p.getTension());
+                    ps.setInt(6, p.getFrequenceCardiaque());
+                    ps.setDouble(7, p.getTemperature());
+                    ps.setInt(8, p.getFrequenceRespiratoire());
+                    ps.setTimestamp(9, Timestamp.valueOf(p.getDateArrivee()));
+                    ps.executeUpdate();
 
-            prpr.executeUpdate();
+                    try (ResultSet keys = ps.getGeneratedKeys()) {
+                        if (keys.next()) {
+                            p.setId(keys.getLong(1));
+                        } else {
+                            throw new SQLException("Aucun ID genere pour le patient");
+                        }
+                    }
+                }
 
-            ResultSet keys = prpr.getGeneratedKeys();
-            if (keys.next()) {
-                p.setId(keys.getLong(1));
+                try (PreparedStatement ps = con.prepareStatement(consultationSql)) {
+                    ps.setLong(1, p.getId());
+                    ps.setString(2, ConsultationStatus.EN_ATTENT.name());
+                    ps.setTimestamp(3, Timestamp.valueOf(p.getDateArrivee()));
+                    ps.executeUpdate();
+                }
+
+                con.commit();
+                return p;
+
+            } catch (SQLException e) {
+                con.rollback();
+                throw e;
+            } finally {
+                con.setAutoCommit(true);
             }
-            return p;
-
         } catch (SQLException e) {
-            throw new RuntimeException("Error while saving patient", e);
+            throw new RuntimeException("Error while saving patient and its initial consultation", e);
         }
     }
 
@@ -60,7 +84,7 @@ public class JdbcPatientDAO implements PatientDAO {
         String sql = "SELECT * FROM patient WHERE id = ?";
 
         try (Connection con = dataSource.getConnection();
-             PreparedStatement prpr = con.prepareStatement(sql)) {
+                PreparedStatement prpr = con.prepareStatement(sql)) {
 
             prpr.setLong(1, id);
             ResultSet res = prpr.executeQuery();
@@ -81,8 +105,8 @@ public class JdbcPatientDAO implements PatientDAO {
         List<Patient> patients = new ArrayList<>();
 
         try (Connection con = dataSource.getConnection();
-             PreparedStatement prpr = con.prepareStatement(sql);
-             ResultSet res = prpr.executeQuery()) {
+                PreparedStatement prpr = con.prepareStatement(sql);
+                ResultSet res = prpr.executeQuery()) {
 
             while (res.next()) {
                 patients.add(mapRow(res));

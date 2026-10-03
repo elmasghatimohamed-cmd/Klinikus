@@ -42,7 +42,6 @@ public class ConsultationServlet extends HttpServlet {
             Patient patient = consultationService.getPatientAConsulter(patientId);
             afficherFormulaire(req, resp, patient);
         } catch (IllegalArgumentException e) {
-            // ID absent, patient inconnu ou déjà consulté : retour à la salle d'attente
             resp.sendRedirect(req.getContextPath() + "/generaliste/attente");
         }
     }

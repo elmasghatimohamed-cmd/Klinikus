@@ -9,10 +9,12 @@ import ma.youcode.klinikus.model.enums.ConsultationStatus;
 public interface ConsultationDAO {
 
     Consultation save(Consultation consultation);
+    
+    Consultation update(Consultation consultation);
 
-    Optional findById(Long id);
+    Optional<Consultation> findById(Long id);
 
-    Optional findByPatientId(Long patientId);
+    Optional<Consultation> findByPatientId(Long patientId);
 
     List<Consultation> findAll();
 

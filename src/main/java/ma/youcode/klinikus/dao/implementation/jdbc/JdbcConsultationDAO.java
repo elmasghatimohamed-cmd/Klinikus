@@ -33,7 +33,7 @@ public class JdbcConsultationDAO implements ConsultationDAO {
                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setLong(1, c.getPatientId());
-            ps.setLong(2, c.getMedecinId());
+            ps.setObject(2, c.getMedecinId(), java.sql.Types.BIGINT);
             ps.setString(3, c.getMotif());
             ps.setString(4, c.getObservations());
             ps.setString(5, c.getDiagnostic());
@@ -54,6 +54,35 @@ public class JdbcConsultationDAO implements ConsultationDAO {
 
         } catch (SQLException e) {
             throw new RuntimeException("Erreur lors de la sauvegarde de la consultation", e);
+        }
+    }
+
+    @Override
+    public Consultation update(Consultation c) {
+        String sql = "UPDATE consultation SET medecin_id = ?, motif = ?, observations = ?, "
+                + "diagnostic = ?, traitement = ?, cout = ?, statut = ?, date_consultation = ? "
+                + "WHERE id = ?";
+
+        try (Connection conn = dataSource.getConnection();
+                PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setObject(1, c.getMedecinId(), java.sql.Types.BIGINT);
+            ps.setString(2, c.getMotif());
+            ps.setString(3, c.getObservations());
+            ps.setString(4, c.getDiagnostic());
+            ps.setString(5, c.getTraitement());
+            ps.setDouble(6, c.getCout());
+            ps.setString(7, c.getStatus().name());
+            ps.setTimestamp(8, Timestamp.valueOf(c.getDateConsultation()));
+            ps.setLong(9, c.getId());
+
+            if (ps.executeUpdate() == 0) {
+                throw new RuntimeException("Consultation introuvable, id=" + c.getId());
+            }
+            return c;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Erreur lors de la mise à jour de la consultation", e);
         }
     }
 
@@ -111,8 +140,8 @@ public class JdbcConsultationDAO implements ConsultationDAO {
     }
 
     @Override
-    public List findPatientIdsWithConsultation() {
-        List patientIds = new ArrayList<>();
+    public List<Long> findPatientIdsWithConsultation() {
+        List<Long> patientIds = new ArrayList<>();
         String sql = "SELECT DISTINCT patient_id FROM consultation";
         try (Connection conn = dataSource.getConnection();
                 Statement stmt = conn.createStatement();
@@ -129,9 +158,11 @@ public class JdbcConsultationDAO implements ConsultationDAO {
 
     private Consultation mapResultSetToConsultation(ResultSet rs) throws SQLException {
         Consultation c = new Consultation();
+        long medecinId = rs.getLong("medecin_id");
+
         c.setId(rs.getLong("id"));
         c.setPatientId(rs.getLong("patient_id"));
-        c.setMedecinId(rs.getLong("medecin_id"));
+        c.setMedecinId(rs.wasNull() ? null : medecinId);
         c.setMotif(rs.getString("motif"));
         c.setObservations(rs.getString("observations"));
         c.setDiagnostic(rs.getString("diagnostic"));

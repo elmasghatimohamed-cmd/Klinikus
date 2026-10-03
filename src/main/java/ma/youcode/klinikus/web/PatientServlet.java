@@ -16,8 +16,6 @@ import ma.youcode.klinikus.dao.implementation.jdbc.JdbcConsultationDAO;
 import ma.youcode.klinikus.dao.implementation.jdbc.JdbcPatientDAO;
 import ma.youcode.klinikus.model.Patient;
 import ma.youcode.klinikus.service.PatientService;
-import javax.sql.DataSource;
-import ma.youcode.klinikus.dao.implementation.jdbc.JdbcConsultationDAO;
 
 @WebServlet("/infirmier/patients")
 public class PatientServlet extends HttpServlet {
@@ -54,9 +52,9 @@ public class PatientServlet extends HttpServlet {
             p.setDateNaissance(LocalDate.parse(req.getParameter("dateNaissance")));
             p.setNumSecu(req.getParameter("numSecu"));
             p.setTension(req.getParameter("tension"));
-            p.setFrequenceCardiaque(Integer.parseInt(req.getParameter("frequenceCardiaque")));
-            p.setTemperature(Double.parseDouble(req.getParameter("temperature")));
-            p.setFrequenceRespiratoire(Integer.parseInt(req.getParameter("frequenceRespiratoire")));
+            p.setFrequenceCardiaque(Integer.valueOf(req.getParameter("frequenceCardiaque")));
+            p.setTemperature(Double.valueOf(req.getParameter("temperature")));
+            p.setFrequenceRespiratoire(Integer.valueOf(req.getParameter("frequenceRespiratoire")));
 
             patientService.enregistrerPatient(p);
             resp.sendRedirect(req.getContextPath() + "/infirmier/patients?success=1");
