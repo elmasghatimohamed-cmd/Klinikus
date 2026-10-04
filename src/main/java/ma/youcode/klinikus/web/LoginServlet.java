@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import ma.youcode.klinikus.dao.implementation.jdbc.JdbcUserDAO;
+import ma.youcode.klinikus.dao.UserDAO;
 import ma.youcode.klinikus.filter.AuthenticationFilter;
 import ma.youcode.klinikus.model.User;
 import ma.youcode.klinikus.model.enums.Role;
@@ -24,8 +24,8 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     public void init() {
-        // Seul endroit qui connaît l'implémentation. Au livrable 2 : new JpaUserDAO().
-        this.authService = new AuthService(new JdbcUserDAO());
+        UserDAO userDAO = (UserDAO) getServletContext().getAttribute("userDAO");
+        this.authService = new AuthService(userDAO);
     }
 
     @Override
@@ -47,7 +47,6 @@ public class LoginServlet extends HttpServlet {
         Optional<User> resultat = authService.authentifier(email, motDePasse);
 
         if (resultat.isEmpty()) {
-            // Même message pour email inconnu et mot de passe faux
             req.setAttribute("erreur", "Email ou mot de passe incorrect.");
             req.setAttribute("email", email);
             req.getRequestDispatcher(VUE_LOGIN).forward(req, resp);
@@ -55,9 +54,8 @@ public class LoginServlet extends HttpServlet {
         }
 
         User user = resultat.get();
-        user.setPassword(null); // le hash ne doit pas rester en session
+        user.setPassword(null);
 
-        // Protection contre la fixation de session : nouvelle session après connexion
         HttpSession ancienne = req.getSession(false);
         if (ancienne != null) {
             ancienne.invalidate();

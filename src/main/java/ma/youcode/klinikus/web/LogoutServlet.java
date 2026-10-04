@@ -14,22 +14,15 @@ public class LogoutServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        seDeconnecter(req, resp);
+        HttpSession session = req.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        resp.sendRedirect(req.getContextPath() + "/login");
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        seDeconnecter(req, resp);
-    }
-
-    private void seDeconnecter(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-
-        HttpSession session = req.getSession(false);
-
-        if (session != null) {
-            session.invalidate();
-        }
-
         resp.sendRedirect(req.getContextPath() + "/login");
     }
 }

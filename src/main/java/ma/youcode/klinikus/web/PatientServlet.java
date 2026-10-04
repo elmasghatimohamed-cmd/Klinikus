@@ -4,16 +4,13 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
-import javax.sql.DataSource;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ma.youcode.klinikus.config.DatabaseConnection;
-import ma.youcode.klinikus.dao.implementation.jdbc.JdbcConsultationDAO;
-import ma.youcode.klinikus.dao.implementation.jdbc.JdbcPatientDAO;
+import ma.youcode.klinikus.dao.ConsultationDAO;
+import ma.youcode.klinikus.dao.PatientDAO;
 import ma.youcode.klinikus.model.Patient;
 import ma.youcode.klinikus.service.PatientService;
 
@@ -24,8 +21,10 @@ public class PatientServlet extends HttpServlet {
 
     @Override
     public void init() {
-        DataSource ds = DatabaseConnection.getDataSource();
-        patientService = new PatientService(new JdbcPatientDAO(ds), new JdbcConsultationDAO(ds));
+        PatientDAO patientDAO = (PatientDAO) getServletContext().getAttribute("patientDAO");
+        ConsultationDAO consultationDAO = (ConsultationDAO) getServletContext().getAttribute("consultationDAO");
+
+        this.patientService = new PatientService(patientDAO, consultationDAO);
     }
 
     @Override
@@ -45,13 +44,14 @@ public class PatientServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
+        Patient p = new Patient();
         try {
-            Patient p = new Patient();
             p.setNom(req.getParameter("nom"));
             p.setPrenom(req.getParameter("prenom"));
             p.setDateNaissance(LocalDate.parse(req.getParameter("dateNaissance")));
             p.setNumSecu(req.getParameter("numSecu"));
             p.setTension(req.getParameter("tension"));
+
             p.setFrequenceCardiaque(Integer.valueOf(req.getParameter("frequenceCardiaque")));
             p.setTemperature(Double.valueOf(req.getParameter("temperature")));
             p.setFrequenceRespiratoire(Integer.valueOf(req.getParameter("frequenceRespiratoire")));
@@ -61,6 +61,7 @@ public class PatientServlet extends HttpServlet {
 
         } catch (IllegalArgumentException | DateTimeParseException | NullPointerException e) {
             req.setAttribute("error", "Donnees invalides, verifiez le formulaire");
+            req.setAttribute("patient", p);
             req.getRequestDispatcher("/WEB-INF/views/infirmier/patient-form.jsp").forward(req, resp);
         }
     }

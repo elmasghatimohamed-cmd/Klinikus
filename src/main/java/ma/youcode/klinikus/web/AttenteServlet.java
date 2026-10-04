@@ -8,11 +8,8 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ma.youcode.klinikus.config.DatabaseConnection;
 import ma.youcode.klinikus.dao.ConsultationDAO;
 import ma.youcode.klinikus.dao.PatientDAO;
-import ma.youcode.klinikus.dao.implementation.jdbc.JdbcConsultationDAO;
-import ma.youcode.klinikus.dao.implementation.jdbc.JdbcPatientDAO;
 import ma.youcode.klinikus.model.Patient;
 import ma.youcode.klinikus.service.ConsultationService;
 
@@ -23,8 +20,9 @@ public class AttenteServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        PatientDAO patientDAO = new JdbcPatientDAO(DatabaseConnection.getDataSource());
-        ConsultationDAO consultationDAO = new JdbcConsultationDAO(DatabaseConnection.getDataSource());
+        PatientDAO patientDAO = (PatientDAO) getServletContext().getAttribute("patientDAO");
+        ConsultationDAO consultationDAO = (ConsultationDAO) getServletContext().getAttribute("consultationDAO");
+
         this.consultationService = new ConsultationService(consultationDAO, patientDAO);
     }
 
