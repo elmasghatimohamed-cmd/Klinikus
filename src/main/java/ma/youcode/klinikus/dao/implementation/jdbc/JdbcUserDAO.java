@@ -7,12 +7,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Optional;
 
-import ma.youcode.klinikus.config.DatabaseConnection;
+import javax.sql.DataSource;
+
 import ma.youcode.klinikus.dao.UserDAO;
 import ma.youcode.klinikus.model.User;
 import ma.youcode.klinikus.model.enums.Role;
 
 public class JdbcUserDAO implements UserDAO {
+
+    private final DataSource dataSource;
+    public JdbcUserDAO(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     private static final String SELECT_BY_EMAIL = "SELECT id, nom, email, mot_de_passe, role " +
             "FROM utilisateur WHERE email = ?";
@@ -25,8 +31,7 @@ public class JdbcUserDAO implements UserDAO {
 
     @Override
     public Optional<User> findByEmail(String email) {
-
-        try (Connection cn = DatabaseConnection.getConnection();
+        try (Connection cn = dataSource.getConnection();
                 PreparedStatement ps = cn.prepareStatement(SELECT_BY_EMAIL)) {
 
             ps.setString(1, email);
@@ -45,8 +50,7 @@ public class JdbcUserDAO implements UserDAO {
 
     @Override
     public Optional<User> findById(Long id) {
-
-        try (Connection cn = DatabaseConnection.getConnection();
+        try (Connection cn = dataSource.getConnection();
                 PreparedStatement ps = cn.prepareStatement(SELECT_BY_ID)) {
 
             ps.setLong(1, id);
@@ -58,15 +62,13 @@ public class JdbcUserDAO implements UserDAO {
             }
 
         } catch (SQLException e) {
-            throw new RuntimeException(
-                    "Erreur lors de la recherche de l'utilisateur par id", e);
+            throw new RuntimeException("Erreur lors de la recherche de l'utilisateur par id", e);
         }
     }
 
     @Override
     public User save(User user) {
-
-        try (Connection cn = DatabaseConnection.getConnection();
+        try (Connection cn = dataSource.getConnection();
                 PreparedStatement ps = cn.prepareStatement(INSERT, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, user.getNom());
@@ -85,13 +87,11 @@ public class JdbcUserDAO implements UserDAO {
             return user;
 
         } catch (SQLException e) {
-            throw new RuntimeException(
-                    "Erreur lors de l'enregistrement de l'utilisateur", e);
+            throw new RuntimeException("Erreur lors de l'enregistrement de l'utilisateur", e);
         }
     }
 
     private User mapper(ResultSet rs) throws SQLException {
-
         return new User(
                 rs.getLong("id"),
                 rs.getString("nom"),
