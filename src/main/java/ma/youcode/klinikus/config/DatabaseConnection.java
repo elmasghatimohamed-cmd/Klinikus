@@ -12,37 +12,35 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 public class DatabaseConnection {
 
-    private static HikariDataSource dataSource;
+    private static final HikariDataSource dataSource;
 
     static {
         try {
+            Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
 
-            Class.forName("org.postgresql.Driver");
+            String dbUrl = getEnvOrProperty(dotenv, "DB_URL");
+            String dbUsername = getEnvOrProperty(dotenv, "DB_USERNAME");
+            String dbPassword = getEnvOrProperty(dotenv, "DB_PASSWORD");
 
-            Dotenv dotenv = Dotenv.load();
+            if (dbUrl == null || dbUsername == null || dbPassword == null) {
+                throw new IllegalStateException(
+                        "Missing required database configuration (DB_URL, DB_USERNAME, DB_PASSWORD).");
+            }
 
             HikariConfig config = new HikariConfig();
+            config.setJdbcUrl(dbUrl);
+            config.setUsername(dbUsername);
+            config.setPassword(dbPassword);
 
-            config.setJdbcUrl(dotenv.get("DB_URL"));
-            config.setUsername(dotenv.get("DB_USERNAME"));
-            config.setPassword(dotenv.get("DB_PASSWORD"));
-
-            config.setMaximumPoolSize(10);
-            config.setMinimumIdle(2);
-            config.setIdleTimeout(30000);
-            config.setConnectionTimeout(30000);
+            config.setMaximumPoolSize(Integer.parseInt(getEnvOrProperty(dotenv, "DB_MAX_POOL_SIZE")));
+            config.setMinimumIdle(Integer.parseInt(getEnvOrProperty(dotenv, "DB_MIN_IDLE")));
+            config.setIdleTimeout(Long.parseLong(getEnvOrProperty(dotenv, "DB_IDLE_TIMEOUT")));
+            config.setConnectionTimeout(Long.parseLong(getEnvOrProperty(dotenv, "DB_CONNECTION_TIMEOUT")));
 
             dataSource = new HikariDataSource(config);
-
-        } catch (ClassNotFoundException e) {
-
-            throw new RuntimeException(
-                    "Driver JDBC introuvable dans le classpath.", e);
-
-        } catch (Exception e) {
-
-            throw new RuntimeException(
-                    "Erreur lors de l'initialisation de la base de donnees.", e);
+        } catch (ExceptionInInitializerError e) {
+            throw new ExceptionInInitializerError(
+                    "Erreur lors de l'initialisation de la base de données: " + e.getMessage());
         }
     }
 
@@ -54,6 +52,9 @@ public class DatabaseConnection {
     }
 
     public static Connection getConnection() throws SQLException {
+        if (dataSource == null || dataSource.isClosed()) {
+            throw new SQLException("La source de donnees n'est pas initialisee ou est fermee.");
+        }
         return dataSource.getConnection();
     }
 
@@ -61,5 +62,13 @@ public class DatabaseConnection {
         if (dataSource != null && !dataSource.isClosed()) {
             dataSource.close();
         }
+    }
+
+    private static String getEnvOrProperty(Dotenv dotenv, String key) {
+        String value = dotenv.get(key);
+        if (value == null || value.trim().isEmpty()) {
+            value = System.getenv(key);
+        }
+        return value;
     }
 }
