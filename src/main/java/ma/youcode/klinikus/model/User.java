@@ -22,10 +22,7 @@ public class User {
     }
 
     public User(String nom, String email, String password, Role role) {
-        this.nom = nom;
-        this.email = email;
-        this.password = password;
-        this.role = role;
+        this(null, nom, email, password, role);
     }
 
     public Long getId() {
@@ -66,5 +63,15 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", nom='" + nom + '\'' +
+                ", email='" + email + '\'' +
+                ", role=" + role +
+                '}';
     }
 }

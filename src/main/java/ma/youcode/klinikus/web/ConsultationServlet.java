@@ -8,11 +8,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import ma.youcode.klinikus.config.DatabaseConnection;
-import ma.youcode.klinikus.dao.ConsultationDAO;
-import ma.youcode.klinikus.dao.PatientDAO;
-import ma.youcode.klinikus.dao.implementation.jdbc.JdbcConsultationDAO;
-import ma.youcode.klinikus.dao.implementation.jdbc.JdbcPatientDAO;
 import ma.youcode.klinikus.filter.AuthenticationFilter;
 import ma.youcode.klinikus.model.Consultation;
 import ma.youcode.klinikus.model.Patient;
@@ -27,11 +22,8 @@ public class ConsultationServlet extends HttpServlet {
     private ConsultationService consultationService;
 
     @Override
-    public void init() throws ServletException {
-        PatientDAO patientDAO = new JdbcPatientDAO(DatabaseConnection.getDataSource());
-        ConsultationDAO consultationDAO = new JdbcConsultationDAO(DatabaseConnection.getDataSource());
-
-        this.consultationService = new ConsultationService(consultationDAO, patientDAO);
+    public void init() {
+        this.consultationService = (ConsultationService) getServletContext().getAttribute("consultationService");
     }
 
     @Override
@@ -67,21 +59,17 @@ public class ConsultationServlet extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/generaliste/attente?success=1");
 
         } catch (IllegalArgumentException e) {
-            Patient patient;
             try {
-                patient = consultationService.getPatientAConsulter(patientId);
+                Patient patient = consultationService.getPatientAConsulter(patientId);
+                req.setAttribute("erreur", e.getMessage());
+                req.setAttribute("motif", motif);
+                req.setAttribute("observations", observations);
+                req.setAttribute("diagnostic", diagnostic);
+                req.setAttribute("traitement", traitement);
+                afficherFormulaire(req, resp, patient);
             } catch (IllegalArgumentException ex) {
                 resp.sendRedirect(req.getContextPath() + "/generaliste/attente");
-                return;
             }
-
-            // On réaffiche le formulaire avec ce que le médecin avait déjà saisi
-            req.setAttribute("erreur", e.getMessage());
-            req.setAttribute("motif", motif);
-            req.setAttribute("observations", observations);
-            req.setAttribute("diagnostic", diagnostic);
-            req.setAttribute("traitement", traitement);
-            afficherFormulaire(req, resp, patient);
         }
     }
 

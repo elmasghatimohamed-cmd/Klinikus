@@ -87,10 +87,10 @@ public class JdbcPatientDAO implements PatientDAO {
                 PreparedStatement prpr = con.prepareStatement(sql)) {
 
             prpr.setLong(1, id);
-            ResultSet res = prpr.executeQuery();
-
-            if (res.next()) {
-                return Optional.of(mapRow(res));
+            try (ResultSet res = prpr.executeQuery()) {
+                if (res.next()) {
+                    return Optional.of(mapRow(res));
+                }
             }
             return Optional.empty();
 

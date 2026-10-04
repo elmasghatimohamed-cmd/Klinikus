@@ -15,11 +15,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
-/**
- * Protection CSRF : un token aléatoire est créé en session (s'il est absent),
- * puis vérifié sur chaque requête POST (champ caché "_csrf").
- * Déclaré dans web.xml AVANT AuthenticationFilter.
- */
 public class CSRFFilter implements Filter {
 
     public static final String SESSION_KEY = "csrfToken";
@@ -34,7 +29,7 @@ public class CSRFFilter implements Filter {
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
 
-        // Ressources statiques : pas de session ni de vérification
+        
         String path = chemin(req);
         if (path.startsWith("/assets/")) {
             chain.doFilter(request, response);
@@ -49,8 +44,6 @@ public class CSRFFilter implements Filter {
         }
 
         if ("POST".equalsIgnoreCase(req.getMethod())) {
-            // Doit être fait avant la première lecture des paramètres (accents dans les
-            // formulaires)
             req.setCharacterEncoding("UTF-8");
 
             String envoye = req.getParameter(PARAM_NAME);
@@ -69,7 +62,6 @@ public class CSRFFilter implements Filter {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(octets);
     }
 
-    // Comparaison en temps constant
     private static boolean egaux(String a, String b) {
         return MessageDigest.isEqual(a.getBytes(StandardCharsets.UTF_8), b.getBytes(StandardCharsets.UTF_8));
     }

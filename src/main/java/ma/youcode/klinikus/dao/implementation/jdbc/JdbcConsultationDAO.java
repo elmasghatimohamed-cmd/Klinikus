@@ -25,39 +25,6 @@ public class JdbcConsultationDAO implements ConsultationDAO {
     }
 
     @Override
-    public Consultation save(Consultation c) {
-        String sql = "INSERT INTO consultation (patient_id, medecin_id, motif, observations, diagnostic, traitement, cout, statut, date_consultation) "
-                + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-
-        try (Connection conn = dataSource.getConnection();
-                PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-
-            ps.setLong(1, c.getPatientId());
-            ps.setObject(2, c.getMedecinId(), java.sql.Types.BIGINT);
-            ps.setString(3, c.getMotif());
-            ps.setString(4, c.getObservations());
-            ps.setString(5, c.getDiagnostic());
-            ps.setString(6, c.getTraitement());
-            ps.setDouble(7, c.getCout());
-            ps.setString(8, c.getStatus() != null ? c.getStatus().name() : ConsultationStatus.EN_ATTENT.name());
-            ps.setTimestamp(9, c.getDateConsultation() != null ? Timestamp.valueOf(c.getDateConsultation())
-                    : new Timestamp(System.currentTimeMillis()));
-
-            ps.executeUpdate();
-
-            try (ResultSet rs = ps.getGeneratedKeys()) {
-                if (rs.next()) {
-                    c.setId(rs.getLong(1));
-                }
-            }
-            return c;
-
-        } catch (SQLException e) {
-            throw new RuntimeException("Erreur lors de la sauvegarde de la consultation", e);
-        }
-    }
-
-    @Override
     public Consultation update(Consultation c) {
         String sql = "UPDATE consultation SET medecin_id = ?, motif = ?, observations = ?, "
                 + "diagnostic = ?, traitement = ?, cout = ?, statut = ?, date_consultation = ? "
