@@ -14,12 +14,6 @@ import jakarta.servlet.http.HttpSession;
 import ma.youcode.klinikus.model.User;
 import ma.youcode.klinikus.model.enums.Role;
 
-/**
- * Vérifie que l'utilisateur est connecté et que son rôle correspond à la
- * section demandée :
- * /infirmier/* -> INFIRMIER, /generaliste/* -> GENERALISTE.
- * Déclaré dans web.xml APRÈS CSRFFilter.
- */
 public class AuthenticationFilter implements Filter {
 
     public static final String SESSION_USER = "utilisateur";
@@ -57,9 +51,7 @@ public class AuthenticationFilter implements Filter {
             return;
         }
 
-        // Empêche l'affichage d'une page protégée depuis le cache après déconnexion
-        // (bouton Retour)
-        res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate");
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
         res.setHeader("Pragma", "no-cache");
         res.setDateHeader("Expires", 0);
 
@@ -73,6 +65,6 @@ public class AuthenticationFilter implements Filter {
                 return e.getValue();
             }
         }
-        return null; // page réservée aux connectés, sans rôle particulier (ex. /logout)
+        return null;
     }
 }
