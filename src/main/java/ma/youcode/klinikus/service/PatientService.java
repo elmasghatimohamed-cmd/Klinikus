@@ -49,7 +49,7 @@ public class PatientService {
 
     public List<Patient> getPatientsDuJour() {
         LocalDate today = LocalDate.now();
-        Set patientsTermines = Set.copyOf(
+        Set<Long> patientsTermines = Set.copyOf(
                 consultationDAO.findPatientIdsByStatus(ConsultationStatus.TERMINEE));
 
         return patientDAO.findAll().stream()
