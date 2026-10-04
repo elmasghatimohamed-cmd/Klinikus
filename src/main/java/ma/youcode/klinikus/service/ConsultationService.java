@@ -8,8 +8,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import ma.youcode.klinikus.config.DatabaseConnection;
 import ma.youcode.klinikus.dao.ConsultationDAO;
 import ma.youcode.klinikus.dao.PatientDAO;
+import ma.youcode.klinikus.dao.implementation.jdbc.JdbcConsultationDAO;
+import ma.youcode.klinikus.dao.implementation.jdbc.JdbcPatientDAO;
 import ma.youcode.klinikus.model.Consultation;
 import ma.youcode.klinikus.model.Patient;
 import ma.youcode.klinikus.model.enums.ConsultationStatus;
@@ -19,7 +22,16 @@ public class ConsultationService {
     private final ConsultationDAO consultationDAO;
     private final PatientDAO patientDAO;
 
+    public ConsultationService() {
+        this(
+                new JdbcConsultationDAO(DatabaseConnection.getDataSource()),
+                new JdbcPatientDAO(DatabaseConnection.getDataSource()));
+    }
+
     public ConsultationService(ConsultationDAO consultationDAO, PatientDAO patientDAO) {
+        if (consultationDAO == null || patientDAO == null) {
+            throw new IllegalArgumentException("ConsultationDAO et PatientDAO ne peuvent pas être null");
+        }
         this.consultationDAO = consultationDAO;
         this.patientDAO = patientDAO;
     }

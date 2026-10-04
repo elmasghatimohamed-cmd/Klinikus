@@ -9,8 +9,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import ma.youcode.klinikus.dao.ConsultationDAO;
-import ma.youcode.klinikus.dao.PatientDAO;
 import ma.youcode.klinikus.model.Patient;
 import ma.youcode.klinikus.service.PatientService;
 
@@ -21,10 +19,7 @@ public class PatientServlet extends HttpServlet {
 
     @Override
     public void init() {
-        PatientDAO patientDAO = (PatientDAO) getServletContext().getAttribute("patientDAO");
-        ConsultationDAO consultationDAO = (ConsultationDAO) getServletContext().getAttribute("consultationDAO");
-
-        this.patientService = new PatientService(patientDAO, consultationDAO);
+        this.patientService = (PatientService) getServletContext().getAttribute("patientService");
     }
 
     @Override
@@ -52,9 +47,20 @@ public class PatientServlet extends HttpServlet {
             p.setNumSecu(req.getParameter("numSecu"));
             p.setTension(req.getParameter("tension"));
 
-            p.setFrequenceCardiaque(Integer.valueOf(req.getParameter("frequenceCardiaque")));
-            p.setTemperature(Double.valueOf(req.getParameter("temperature")));
-            p.setFrequenceRespiratoire(Integer.valueOf(req.getParameter("frequenceRespiratoire")));
+            String freqCardStr = req.getParameter("frequenceCardiaque");
+            if (freqCardStr != null && !freqCardStr.isBlank()) {
+                p.setFrequenceCardiaque(Integer.valueOf(freqCardStr));
+            }
+
+            String tempStr = req.getParameter("temperature");
+            if (tempStr != null && !tempStr.isBlank()) {
+                p.setTemperature(Double.valueOf(tempStr));
+            }
+
+            String freqRespStr = req.getParameter("frequenceRespiratoire");
+            if (freqRespStr != null && !freqRespStr.isBlank()) {
+                p.setFrequenceRespiratoire(Integer.valueOf(freqRespStr));
+            }
 
             patientService.enregistrerPatient(p);
             resp.sendRedirect(req.getContextPath() + "/infirmier/patients?success=1");

@@ -8,8 +8,6 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import ma.youcode.klinikus.dao.ConsultationDAO;
-import ma.youcode.klinikus.dao.PatientDAO;
 import ma.youcode.klinikus.filter.AuthenticationFilter;
 import ma.youcode.klinikus.model.Consultation;
 import ma.youcode.klinikus.model.Patient;
@@ -24,11 +22,8 @@ public class ConsultationServlet extends HttpServlet {
     private ConsultationService consultationService;
 
     @Override
-    public void init() throws ServletException {
-        PatientDAO patientDAO = (PatientDAO) getServletContext().getAttribute("patientDAO");
-        ConsultationDAO consultationDAO = (ConsultationDAO) getServletContext().getAttribute("consultationDAO");
-
-        this.consultationService = new ConsultationService(consultationDAO, patientDAO);
+    public void init() {
+        this.consultationService = (ConsultationService) getServletContext().getAttribute("consultationService");
     }
 
     @Override

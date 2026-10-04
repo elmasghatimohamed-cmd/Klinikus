@@ -8,37 +8,28 @@ import javax.sql.DataSource;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-import io.github.cdimascio.dotenv.Dotenv;
-
 public class DatabaseConnection {
 
     private static final HikariDataSource dataSource;
 
     static {
         try {
-            Dotenv dotenv = Dotenv.configure().ignoreIfMissing().load();
 
-            String dbUrl = getEnvOrProperty(dotenv, "DB_URL");
-            String dbUsername = getEnvOrProperty(dotenv, "DB_USERNAME");
-            String dbPassword = getEnvOrProperty(dotenv, "DB_PASSWORD");
-
-            if (dbUrl == null || dbUsername == null || dbPassword == null) {
-                throw new IllegalStateException(
-                        "Missing required database configuration (DB_URL, DB_USERNAME, DB_PASSWORD).");
-            }
-
+            Class.forName("org.postgresql.Driver");
             HikariConfig config = new HikariConfig();
-            config.setJdbcUrl(dbUrl);
-            config.setUsername(dbUsername);
-            config.setPassword(dbPassword);
+            config.setJdbcUrl("jdbc:postgresql://localhost:5432/klinikus_db");
+            config.setUsername("mohamed");
+            config.setPassword("admin123");
 
-            config.setMaximumPoolSize(Integer.parseInt(getEnvOrProperty(dotenv, "DB_MAX_POOL_SIZE")));
-            config.setMinimumIdle(Integer.parseInt(getEnvOrProperty(dotenv, "DB_MIN_IDLE")));
-            config.setIdleTimeout(Long.parseLong(getEnvOrProperty(dotenv, "DB_IDLE_TIMEOUT")));
-            config.setConnectionTimeout(Long.parseLong(getEnvOrProperty(dotenv, "DB_CONNECTION_TIMEOUT")));
+            config.setMaximumPoolSize(10);
+            config.setMinimumIdle(2);
+            config.setIdleTimeout(300000L);
+            config.setConnectionTimeout(30000L);
 
             dataSource = new HikariDataSource(config);
-        } catch (ExceptionInInitializerError e) {
+            System.out.println("HikariCP DataSource successfully initialized.");
+        } catch (Exception e) {
+            System.err.println(" Failed to initialize HikariCP connection pool: " + e.getMessage());
             throw new ExceptionInInitializerError(
                     "Erreur lors de l'initialisation de la base de données: " + e.getMessage());
         }
@@ -53,7 +44,7 @@ public class DatabaseConnection {
 
     public static Connection getConnection() throws SQLException {
         if (dataSource == null || dataSource.isClosed()) {
-            throw new SQLException("La source de donnees n'est pas initialisee ou est fermee.");
+            throw new SQLException("La source de données n'est pas initialisée ou est fermée.");
         }
         return dataSource.getConnection();
     }
@@ -61,14 +52,7 @@ public class DatabaseConnection {
     public static void closePool() {
         if (dataSource != null && !dataSource.isClosed()) {
             dataSource.close();
+            System.out.println("[INFO] HikariCP connection pool closed.");
         }
-    }
-
-    private static String getEnvOrProperty(Dotenv dotenv, String key) {
-        String value = dotenv.get(key);
-        if (value == null || value.trim().isEmpty()) {
-            value = System.getenv(key);
-        }
-        return value;
     }
 }
