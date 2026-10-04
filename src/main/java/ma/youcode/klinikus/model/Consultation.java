@@ -1,7 +1,8 @@
 package ma.youcode.klinikus.model;
 
-import ma.youcode.klinikus.model.enums.ConsultationStatus;
 import java.time.LocalDateTime;
+
+import ma.youcode.klinikus.model.enums.ConsultationStatus;
 
 public class Consultation {
     public static final double COUT_FIXE = 150.0; // DH

@@ -4,13 +4,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class Patient {
+
     private Long id;
     private String nom;
     private String prenom;
     private LocalDate dateNaissance;
     private String numSecu;
 
-    // vital signs stored directly in Patient (per the brief)
     private String tension;
     private Integer frequenceCardiaque;
     private Double temperature;
@@ -73,17 +73,15 @@ public class Patient {
         return frequenceCardiaque;
     }
 
-    public void setFrequenceCardiaque(Integer f) {
-        this.frequenceCardiaque = f;
+    public void setFrequenceCardiaque(Integer frequenceCardiaque) {
+        this.frequenceCardiaque = frequenceCardiaque;
     }
 
     public Double getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(Double temperature)
-
-    {
+    public void setTemperature(Double temperature) {
         this.temperature = temperature;
     }
 
@@ -91,8 +89,8 @@ public class Patient {
         return frequenceRespiratoire;
     }
 
-    public void setFrequenceRespiratoire(Integer f) {
-        this.frequenceRespiratoire = f;
+    public void setFrequenceRespiratoire(Integer frequenceRespiratoire) {
+        this.frequenceRespiratoire = frequenceRespiratoire;
     }
 
     public LocalDateTime getDateArrivee() {
@@ -103,4 +101,13 @@ public class Patient {
         this.dateArrivee = dateArrivee;
     }
 
+    @Override
+    public String toString() {
+        return "Patient{" +
+                "id=" + id +
+                ", nom='" + nom + '\'' +
+                ", prenom='" + prenom + '\'' +
+                ", numSecu='" + numSecu + '\'' +
+                '}';
+    }
 }
