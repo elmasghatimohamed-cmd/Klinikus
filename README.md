@@ -1,20 +1,35 @@
 
-# Klinikus — Application Web de Gestion Médicale
+# Klinikus — Medical Management Web Application
 
-Klinikus est une application web de gestion médicale développée avec Java EE, permettant de structurer les opérations d'un établissement de santé et de faciliter la gestion des patients par le personnel autorisé.
+## Overview
 
-Le projet met en pratique une architecture en couches, la persistance des données avec JPA/Hibernate, la gestion des sessions et la sécurisation des requêtes web.
+Klinikus is a medical management web application designed to facilitate healthcare operations through a structured, secure, and user-friendly interface. It focuses on patient management, authentication, and controlled access to medical information.
 
-## Technologies utilisées
+The application follows the MVC pattern and a layered architecture, separating presentation, business logic, and data access to improve maintainability and code organization.
+
+## Features
+
+- **Patient Management:** Access and manage patient information through a dedicated interface.
+- **Authentication:** Authenticate users and manage access to protected resources.
+- **Access Control:** Restrict application features according to authorization rules.
+- **Session Management:** Maintain user sessions and control access to protected pages.
+- **CSRF Protection:** Protect supported requests against Cross-Site Request Forgery attacks.
+- **Database Persistence:** Store and retrieve application data through an ORM-based persistence layer.
+- **Dynamic Web Pages:** Generate server-side views using JSP.
+- **Responsive Interface:** Provide a clean interface using Tailwind CSS and JavaScript.
+
+## Technologies
 
 ### Backend
 - Java 17
 - Jakarta Servlets
-- JSP (JavaServer Pages)
-- JPA
-- Hibernate ORM 6.6
+- JavaServer Pages (JSP)
 - JDBC
-- Maven
+
+### Persistence and Database
+- JPA (Java Persistence API)
+- Hibernate ORM 6.6
+- PostgreSQL
 
 ### Frontend
 - HTML5
@@ -22,200 +37,84 @@ Le projet met en pratique une architecture en couches, la persistance des donné
 - JavaScript
 - Plus Jakarta Sans
 
-### Base de données
-- PostgreSQL
+### Security
+- Authentication Filters
+- Session Management
+- CSRF Protection
+- Role-Based Access Control
 
-### Serveur et outils
-- Apache Tomcat 10.1+
-- Git & GitHub
-- IntelliJ IDEA ou Eclipse
-- pgAdmin ou un client PostgreSQL
-
-## Fonctionnalités
-
-### Gestion des patients
-- Consultation de la liste des patients.
-- Organisation de l'accès aux données des patients.
-- Gestion des opérations liées aux patients selon les autorisations définies dans l'application.
-
-### Authentification et autorisation
-- Authentification des utilisateurs.
-- Gestion des sessions utilisateur.
-- Protection des routes selon les règles d'accès.
-- Contrôle des requêtes à l'aide de filtres.
-
-### Sécurité
-- Filtrage des requêtes HTTP.
-- Protection contre les attaques CSRF.
-- Contrôle de l'accès aux ressources protégées.
-- Séparation entre les responsabilités métier et la couche de présentation.
-
-## Architecture du projet
-
-Le projet suit une architecture en couches afin de séparer les responsabilités et de faciliter la maintenance du code.
-
-- **Servlets / Controllers :** reçoivent les requêtes HTTP et coordonnent les traitements.
-- **Services :** regroupent la logique métier.
-- **DAO / Repositories :** gèrent l'accès aux données.
-- **Models / Entities :** représentent les objets métier et les entités persistées.
-- **JSP :** génèrent les vues côté serveur.
-- **Filters :** contrôlent l'accès aux ressources et appliquent les protections de sécurité.
-- **JPA / Hibernate :** assurent le mapping objet-relationnel et la persistance des données.
-
-## Prérequis
-
-Avant de démarrer le projet, assurez-vous d'avoir installé :
-
-- JDK 17
+### Build and Deployment
 - Apache Maven
-- PostgreSQL
 - Apache Tomcat 10.1+
-- Un IDE Java
 
-## Installation
-
-### 1. Cloner le projet
-
-```bash
-git clone <repository-url>
-cd Klinikus
-```
-
-Remplacez `<repository-url>` par l'URL réelle du dépôt Git.
-
-### 2. Configurer PostgreSQL
-
-Créez ou configurez la base de données utilisée par l'application.
-
-Vérifiez ensuite les paramètres de connexion dans la configuration JPA, notamment :
-
-- L'URL JDBC
-- Le nom d'utilisateur
-- Le mot de passe
-- Le pilote PostgreSQL
-
-La persistence unit utilisée par le projet est :
-
-```text
-klinikusPU
-```
-
-Adaptez la configuration à votre environnement local.
-
-### 3. Construire le projet
-
-À la racine du projet, exécutez :
-
-```bash
-mvn clean package
-```
-
-Si le projet est configuré avec le packaging WAR, le fichier généré sera disponible dans le dossier `target/`.
-
-### 4. Déployer sur Tomcat
-
-Déployez le fichier WAR sur Apache Tomcat 10.1+, puis démarrez le serveur.
-
-Vous pouvez également configurer Tomcat directement depuis votre IDE.
-
-### 5. Accéder à l'application
-
-Ouvrez votre navigateur et accédez à l'URL correspondant au contexte de déploiement configuré.
-
-Exemple :
-
-```text
-http://localhost:8080/klinikus/
-```
-
-Le chemin exact dépend du nom du WAR et de la configuration de Tomcat.
-
-## Configuration et persistance
-
-La persistance des données repose sur JPA et Hibernate, avec PostgreSQL comme système de gestion de base de données.
-
-Les opérations d'accès aux données sont organisées à travers des DAO ou repositories, utilisés par la couche service.
-
-Exemple de composants du module patients :
-
-- `PatientDAO`
-- `JdbcPatientDAO`
-- `PatientService`
-
-La configuration de la persistence unit et les paramètres de connexion doivent correspondre à l'environnement utilisé.
-
-## Sécurité
-
-La sécurité de l'application repose notamment sur :
-
-- Des filtres d'authentification pour contrôler l'accès aux ressources.
-- Un filtre CSRF pour protéger les requêtes contre les falsifications intersites.
-- La gestion des sessions utilisateur.
-- La séparation des responsabilités entre contrôleurs, services et accès aux données.
-
-Les identifiants de base de données et autres informations sensibles ne doivent pas être publiés dans le dépôt.
-
-## Structure générale
-
-La structure ci-dessous illustre l'organisation logique du projet. Les noms exacts des packages peuvent varier selon l'implémentation.
+## Project Structure
 
 ```text
 Klinikus/
 ├── src/
 │   └── main/
 │       ├── java/
-│       │   └── ma/klinikus/
-│       │       ├── controller/
-│       │       ├── service/
-│       │       ├── dao/
-│       │       ├── repository/
-│       │       ├── model/
-│       │       ├── filter/
-│       │       └── config/
+│       │   └── ma/
+│       │       └── klinikus/
+│       │           ├── controller/
+│       │           ├── service/
+│       │           ├── dao/
+│       │           ├── repository/
+│       │           ├── model/
+│       │           ├── filter/
+│       │           └── config/
 │       ├── resources/
+│       │   └── META-INF/
+│       │       └── persistence.xml
 │       └── webapp/
+│           ├── assets/
+│           ├── css/
+│           ├── js/
 │           └── WEB-INF/
+│               ├── views/
 │               └── web.xml
 ├── pom.xml
 └── README.md
 ```
 
-Cette arborescence est indicative et doit être adaptée à la structure réelle du dépôt.
+*Note: This structure represents the logical organization of the application. Directory and package names should match the actual project implementation.*
 
-## Tests et vérifications
+## Architecture
 
-Avant de considérer l'application comme opérationnelle, vérifiez les points suivants :
+The application uses a layered architecture to separate responsibilities.
 
-- [ ] Le projet compile correctement avec Java 17.
-- [ ] La connexion PostgreSQL fonctionne.
-- [ ] Hibernate initialise correctement la persistence unit `klinikusPU`.
-- [ ] L'application se déploie correctement sur Tomcat.
-- [ ] L'authentification fonctionne.
-- [ ] Les routes protégées respectent les autorisations définies.
-- [ ] La liste des patients est accessible aux utilisateurs autorisés.
-- [ ] Les opérations de persistance fonctionnent correctement.
-- [ ] Le filtre CSRF protège les requêtes concernées.
-- [ ] Les erreurs sont traitées de manière appropriée.
+- **Controller Layer:** Handles HTTP requests and coordinates application workflows through Servlets.
+- **Service Layer:** Contains business logic and coordinates operations between controllers and data access components.
+- **DAO / Repository Layer:** Encapsulates database queries and persistence operations.
+- **Model Layer:** Represents application entities and domain objects.
+- **Presentation Layer:** Uses JSP to render dynamic HTML pages, styled with Tailwind CSS.
+- **Security Layer:** Uses filters to handle authentication, access restrictions, and CSRF protection.
+- **Persistence Layer:** Uses JPA and Hibernate to map Java objects to PostgreSQL tables.
 
-## Objectifs pédagogiques
+## Database and Persistence
 
-Ce projet permet de mettre en pratique :
+Klinikus uses PostgreSQL as its relational database and JPA/Hibernate for object-relational mapping.
 
-- Le développement web avec Java et Jakarta Servlets.
-- Le modèle MVC et l'architecture en couches.
-- La persistance avec JPA/Hibernate et PostgreSQL.
-- La gestion des sessions et des filtres HTTP.
-- La sécurisation des formulaires et des requêtes.
-- Le déploiement d'une application web Java sur Tomcat.
+The persistence layer manages interactions between Java entities and database records, while DAO or repository components organize data access operations.
 
-## Auteur
+The application uses a dedicated persistence unit named `klinikusPU`.
 
-**Badr FENNI**
+## Security
 
-Full Stack Developer
+Security mechanisms are integrated into the request-processing workflow to protect application resources.
 
-Technologies : Java, Servlets, JSP, JPA/Hibernate, PostgreSQL, HTML, Tailwind CSS et JavaScript.
+- Authentication and session validation.
+- Access restrictions for protected routes.
+- Request filtering and authorization checks.
+- CSRF protection for applicable state-changing requests.
+- Separation of security concerns from business logic.
 
-## Licence
+## Project Objectives
 
-Ajouter une licence appropriée si le projet est destiné à être distribué publiquement.
+- Apply MVC and layered architecture principles.
+- Develop a Java web application using Servlets and JSP.
+- Implement persistence with JPA, Hibernate, and PostgreSQL.
+- Organize business logic and database access into separate layers.
+- Integrate authentication and request security.
+- Build a clean, maintainable, and responsive web interface.
+```
